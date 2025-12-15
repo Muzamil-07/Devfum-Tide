@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import React, { Suspense, useRef, useMemo, useState, useCallback, useEffect } from 'react'
 import { Canvas, extend, useThree, useLoader, useFrame } from '@react-three/fiber'
-import { Effects, Environment, OrbitControls, Sky, useHelper } from '@react-three/drei'
+import { Effects, Environment, Loader, OrbitControls, Sky, useHelper } from '@react-three/drei'
 import { WobbleBubble } from './WobbleBubble'
 import { Rock } from './Rock'
 // import { BubbleEmitter } from './BubbleEmitter'
@@ -82,13 +82,14 @@ export default function App() {
     }
   })
   return (
+    <>
     <Canvas camera={{ position: [0, 5, 150], fov: 55, near: 1, far: 20000 }}
     >
       {/* Mouse-following camera effect */}
       <MouseFollowCamera intensity={0.02} smoothness={0.1} />
-      
+
       {/* <pointLight decay={0} position={[100, 100, 100]} />
-      <pointLight decay={0.5} position={[-100, -100, -100]} /> */}
+    <pointLight decay={0.5} position={[-100, -100, -100]} /> */}
       {/* Add the light component with helper */}
       {/* <PointLightWithHelper /> */}
       {/* <DirectionalLightWithHelper/> */}
@@ -98,34 +99,37 @@ export default function App() {
       </EffectComposer>
       <Suspense fallback={null}>
         <Environment background path='/' files={"rock color.hdr"} backgroundRotation={[0, degToRad(112), 0]} environmentIntensity={1} />
-          <Ocean />
-          {/* <Box /> */}
+        <Ocean />
+        {/* <Box /> */}
 
-          <group position={[-1.3, -11, 55]} scale={0.9}>
+        <group position={[-1.3, -11, 55]} scale={0.9}>
           <WobbleBubble position={[0, 28, 0]} radius={11.5} />
           <DevfumLogo position={[0, 28, 0]} scale={0.23} />
-          </group>
-          {/* Center Rock */}
-          <Rock position={[0, 15, 40]} scale={0.7} />
-          {/* LEft close rock */}
-          <Rock position={[-5.5, -1.3, 150]} rotation={[degToRad(90), 0, 0]} scale={0.2} />
-          {/* <BubbleEmitter waterY={0} topY={80} area={[160, 160]} maxBubbles={3} /> */}
-          <OneShotBubbles
-            waterY={-2}
-            topY={80}
-            spawnCenter={[1, 85]}
-            spacing={20}     // distance between bubbles
-            direction="x"    // spread along X (use "z" to spread along Z)
-            jitter={0.1}
-            riseSpeedRange={[0.7, 1.2]}  // slower
-          />
-          {/* <Effects>
-      </Effects> */}
+        </group>
+        {/* Center Rock */}
+        <Rock position={[0, 15, 40]} scale={0.7} />
+        {/* LEft close rock */}
+        <Rock position={[-5.5, -1.3, 150]} rotation={[degToRad(90), 0, 0]} scale={0.2} />
+        {/* <BubbleEmitter waterY={0} topY={80} area={[160, 160]} maxBubbles={3} /> */}
+        <OneShotBubbles
+          waterY={-2}
+          topY={80}
+          spawnCenter={[1, 85]}
+          spacing={20} // distance between bubbles
+          direction="x" // spread along X (use "z" to spread along Z)
+          jitter={0.1}
+          riseSpeedRange={[0.7, 1.2]} // slower
+        />
+        {/* <Effects>
+</Effects> */}
 
       </Suspense>
       {/* <Sky scale={1000} sunPosition={[500, 150, -1000]} turbidity={0.1} /> */}
       <OrbitControls enableZoom={false} minPolarAngle={degToRad(88)} maxPolarAngle={degToRad(10)} minAzimuthAngle={degToRad(0)} maxAzimuthAngle={degToRad(360)} />
       {/* <OrbitControls  /> */}
     </Canvas>
+    <Loader />
+    </>
+
   )
 }
