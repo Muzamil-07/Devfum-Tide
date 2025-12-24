@@ -1,0 +1,206 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
+
+* {
+  box-sizing: border-box;
+  font-family: 'Quicksand', sans-serif;
+
+}
+.loaderOverlay {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    z-index: 9999;
+  
+    display: grid;
+    place-items: center;
+  
+    opacity: 0;
+    transition: opacity 650ms ease;
+  
+    overflow: hidden;
+  
+    /* IMPORTANT */
+    isolation: isolate; /* makes blend layers behave */
+  }
+  
+  .loaderOverlay.show { opacity: 1; }
+  .loaderOverlay.hide { opacity: 0; pointer-events: none; }
+  
+
+  /* Adjust offsets here */
+.loaderInner.offset {
+    transform: translate(0px, 29px); /* X , Y */
+    /* transform: translate(3.5px, -73px);  */
+  }
+
+/* ---------- Right-side content overlay (revealed after first scroll) ---------- */
+.sideContent {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 64px;
+  z-index: -10; /* above canvas, below loader (9999) */
+  opacity: 0;
+  transform: translateX(18px);
+  transition: opacity 700ms ease, transform 700ms ease;
+  pointer-events: none;
+  /* Prvent text selectable */
+  user-select: none;
+}
+
+.sideContent.show {
+  z-index: 10; /* above canvas, below loader (9999) */
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.sideContentInner {
+  width: min(520px, 44vw);
+  color: #D0D6E2;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  /* text-shadow: 0 2px 18px rgba(0, 0, 0, 0.35); */
+  pointer-events: auto; /* allow clicking the Explore button */
+}
+
+.sideContentEyebrow {
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-size: 12px;
+  opacity: 0.9;
+  margin-bottom: 10px;
+}
+
+.sideContentTitle {
+  margin: 0 0 12px 0;
+  font-size: 44px;
+  line-height: 1.05;
+}
+
+.sideContentBody {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.55;
+  opacity: 0.9;
+}
+
+/* ---------- Glass button ---------- */
+.glassButton {
+  margin-top: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  user-select: none;
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  /* box-shadow:
+    0 18px 55px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18); */
+  transition: transform 180ms ease, background 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.glassButton:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.5);
+  /* box-shadow:
+    0 22px 70px rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22); */
+}
+
+.glassButton:active {
+  transform: translateY(0px);
+}
+
+.glassButton:focus-visible {
+  outline: none;
+  /* box-shadow:
+    0 0 0 3px rgba(255, 255, 255, 0.22),
+    0 18px 55px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18); */
+}
+
+.bgAudioEnable {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 20; /* above canvas + sideContent */
+}
+
+.soundControls {
+  position: fixed;
+  left: 18px;
+  bottom: 18px;
+  z-index: 20;
+  width: min(320px, calc(100vw - 36px));
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.10);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  color: rgba(255, 255, 255, 0.92);
+  pointer-events: auto;
+  user-select: none;
+}
+
+.soundControlsTitle {
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.85;
+  margin-bottom: 10px;
+}
+
+.soundRow {
+  display: grid;
+  grid-template-columns: 68px 1fr 52px;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.soundRow:last-child {
+  margin-bottom: 0;
+}
+
+.soundLabel {
+  font-size: 13px;
+  opacity: 0.92;
+}
+
+.soundValue {
+  font-size: 12px;
+  opacity: 0.82;
+  text-align: right;
+}
+
+.soundSlider {
+  width: 100%;
+}
+
+@media (max-width: 900px) {
+  .sideContent {
+    padding: 28px;
+    justify-content: center;
+  }
+  .sideContentInner {
+    width: min(560px, 92vw);
+    text-align: center;
+  }
+  .sideContentTitle {
+    font-size: 34px;
+  }
+}
+  

@@ -8,10 +8,16 @@ export const degToRad = (degrees) => {
 
 
 // Mouse-following camera component
-export const MouseFollowCamera = ({ intensity = 0.02, smoothness = 0.1 }) => {
+export const MouseFollowCamera = ({
+  intensity = 0.02,
+  smoothness = 0.1,
+  basePosition = [0, 5, 150],
+  basePositionRef,
+  baseRotationRef,
+  baseLookAtRef,
+}) => {
     const { camera, size } = useThree();
     const mousePosition = useRef({ x: 0, y: 0 });
-    const targetPosition = useRef({ x: 0, y: 0, z: 0 });
     const currentOffset = useRef({ x: 0, y: 0, z: 0 });
   
     // Track mouse movement
@@ -27,6 +33,10 @@ export const MouseFollowCamera = ({ intensity = 0.02, smoothness = 0.1 }) => {
     }, [size]);
   
     useFrame(() => {
+      const basePos = basePositionRef?.current ?? { x: basePosition[0], y: basePosition[1], z: basePosition[2] }
+      const baseRot = baseRotationRef?.current ?? { x: camera.rotation.x, y: camera.rotation.y, z: camera.rotation.z }
+      const baseLookAt = baseLookAtRef?.current
+
       // Calculate target offset based on mouse position
       const targetX = mousePosition.current.x * intensity * 50;
       const targetY = mousePosition.current.y * intensity * 30;
@@ -37,16 +47,27 @@ export const MouseFollowCamera = ({ intensity = 0.02, smoothness = 0.1 }) => {
       currentOffset.current.y += (targetY - currentOffset.current.y) * smoothness;
       currentOffset.current.z += (targetZ - currentOffset.current.z) * smoothness;
   
-      // Apply offset to camera position (relative to base position)
-      const basePosition = [0, 5, 150]; // Your original camera position
+      // Apply offset to camera position (relative to animated base position)
       camera.position.set(
-        basePosition[0] + currentOffset.current.x,
-        basePosition[1] + currentOffset.current.y,
-        basePosition[2] + currentOffset.current.z
+        basePos.x + currentOffset.current.x,
+        basePos.y + currentOffset.current.y,
+        basePos.z + currentOffset.current.z
       );
   
-      // Optional: Add subtle rotation based on mouse position for more dynamic feel
-      camera.rotation.z = mousePosition.current.x * intensity * 0.1;
+      // Safety: never let mouse shake push us underwater
+      if (camera.position.y < 0.55) camera.position.y = 0.55
+  
+      // Orientation:
+      // - If baseLookAtRef is provided, always look at it (cinematic + stable)
+      // - Otherwise, use baseRotationRef
+      if (baseLookAt) {
+        camera.lookAt(baseLookAt.x, baseLookAt.y, baseLookAt.z)
+      } else {
+        camera.rotation.set(baseRot.x, baseRot.y, baseRot.z);
+      }
+
+      // Subtle roll based on mouse position (shake feel)
+      camera.rotation.z += mousePosition.current.x * intensity * 0.1;
     });
   
     return null;

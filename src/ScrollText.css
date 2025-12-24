@@ -1,0 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
+
+.scroll-text-container {
+  pointer-events: none;
+  user-select: none;
+}
+
+.scroll-text {
+  font-family: 'Quicksand', sans-serif;
+  font-size: 30px;
+  font-weight: 400;
+  color: #D0D6E2;
+  letter-spacing: 0.8em;
+  text-transform: lowercase;
+  text-align: center;
+  white-space: nowrap;
+  /* text-shadow: 0 2px 12px rgba(255, 255, 255, 0.4); */
+  
+  /* Blinking animation */
+  animation: blinkSlow 3s ease-in-out infinite;
+}
+
+@keyframes blinkSlow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+}

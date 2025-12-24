@@ -1,5 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
+
 * {
   box-sizing: border-box;
+  font-family: 'Quicksand', sans-serif;
+
 }
 
 html,
@@ -14,3 +18,32 @@ body,
 body {
   background: white;
 }
+
+/* Fullscreen black overlay */
+.loaderOverlay {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  display: grid;
+  place-items: center;
+  z-index: 9999;
+
+  opacity: 0;
+  transition: opacity 650ms ease;
+  pointer-events: none;
+}
+
+.loaderOverlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.loaderOverlay.hide {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.loaderInner {
+  transform: translateZ(0); /* helps smoothness on some GPUs */
+}
+
