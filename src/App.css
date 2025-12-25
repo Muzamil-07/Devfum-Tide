@@ -123,7 +123,7 @@
     opacity: 0; /* animated by GSAP */
     pointer-events: none; /* GSAP enables on ready */
     margin-top: 0;
-    width: 200px;
+    width: 160px;
     will-change: opacity;
     background: linear-gradient(
       90deg,
