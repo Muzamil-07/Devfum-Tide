@@ -8,14 +8,18 @@
 .loaderOverlay {
     position: fixed;
     inset: 0;
-    background: #000;
+    background-color: #000;
     z-index: 9999;
   
     display: grid;
     place-items: center;
   
     opacity: 0;
-    transition: opacity 650ms ease;
+    transition:
+      opacity 650ms ease,
+      background-color 650ms ease,
+      -webkit-backdrop-filter 650ms ease,
+      backdrop-filter 650ms ease;
   
     overflow: hidden;
   
@@ -23,13 +27,115 @@
     isolation: isolate; /* makes blend layers behave */
   }
   
-  .loaderOverlay.show { opacity: 1; }
+  .loaderOverlay.show { opacity: 1; pointer-events: auto; }
   .loaderOverlay.hide { opacity: 0; pointer-events: none; }
+
+  /* When loading finishes (100%), shift the black overlay into a glassy blur */
+  .loaderOverlay.ready {
+    background-color: rgba(0, 0, 0, 0.38);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    backdrop-filter: blur(18px) saturate(140%);
+  }
+
+  /* subtle glass sheen */
+  .loaderOverlay.ready::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(60% 40% at 50% 10%, rgba(255, 255, 255, 0.10), transparent 60%),
+      radial-gradient(40% 30% at 10% 60%, rgba(255, 255, 255, 0.06), transparent 60%),
+      radial-gradient(40% 30% at 90% 70%, rgba(255, 255, 255, 0.05), transparent 60%);
+    opacity: 1;
+    pointer-events: none;
+    z-index: 0;
+  }
   
+  /* Loader logo should visually match the 3D logo scale across screen sizes */
+  :root {
+    --loader-logo-size: clamp(220px, 34vmin, 620px);
+  }
+
+  .loaderLogo {
+    width: 30vw;
+    height: 30vw;
+    display: block;
+  }
+
+  /* Loader progress + enter button are anchored below the logo WITHOUT shifting it */
+  .loaderActions {
+    position: absolute;
+    left: 50%;
+    top: calc(23vw);
+    transform: translateX(-50%);
+    width: clamp(120px, 18vmin, 220px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 2;
+  }
+
+  .loaderProgressWrap {
+    width: 100%;
+    opacity: 1; /* animated by GSAP */
+    margin-bottom: 14px;
+    pointer-events: none;
+    will-change: opacity;
+  }
+
+  .loaderProgressText {
+    width: 100%;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.88);
+    margin-bottom: 8px;
+    user-select: none;
+  }
+
+  .loaderProgressBar {
+    width: 100%;
+    height: 6px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    background: rgba(255, 255, 255, 0.10);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    overflow: hidden;
+  }
+
+  .loaderProgressFill {
+    width: 100%;
+    height: 100%;
+    transform-origin: 0% 50%;
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.88),
+      rgba(255, 255, 255, 0.55)
+    );
+    /* box-shadow: 0 0 18px rgba(255, 255, 255, 0.22); */
+    transition: transform 220ms ease;
+  }
+
+  .loaderEnterButton {
+    opacity: 0; /* animated by GSAP */
+    pointer-events: none; /* GSAP enables on ready */
+    margin-top: 0;
+    width: 200px;
+    will-change: opacity;
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.38),
+      rgba(255, 255, 255, 0.55)
+    ) !important;
+  }
+
 
   /* Adjust offsets here */
 .loaderInner.offset {
-    transform: translate(0px, 29px); /* X , Y */
+    transform: translate(1px, 2vw); /* X , Y */
     /* transform: translate(3.5px, -73px);  */
   }
 
@@ -92,12 +198,12 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 12px 18px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  background: rgba(255, 255, 255, 0.12);
-  color: rgba(255, 255, 255, 0.92);
   font-size: 14px;
+  padding: 12px 18px;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.92);
   font-weight: 600;
   letter-spacing: 0.02em;
   cursor: pointer;
@@ -204,3 +310,6 @@
   }
 }
   
+#leva__root div{
+  display: none !important;
+}

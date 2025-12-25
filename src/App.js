@@ -334,12 +334,12 @@ export default function App() {
   return (
     <>
       <BackgroundAudio volume={seaVolume} />
-      <SoundControls
+      {/* <SoundControls
         seaVolume={seaVolume}
         bubbleVolume={bubbleVolume}
         onSeaVolumeChange={setSeaVolume}
         onBubbleVolumeChange={setBubbleVolume}
-      />
+      /> */}
       <Navbar />
       <Canvas camera={{ position: [0, 5, 150], fov: 45, near: 1, far: 20000 }}
       >
@@ -376,7 +376,7 @@ export default function App() {
         <EffectComposer disableNormalPass>
           <Bloom luminanceThreshold={10.0} levels={bloomLevelsValue} intensity={bloomIntensityValue} />
           <ToneMapping middleGrey={middleGrey} maxLuminance={maxLuminance} />
-          <Noise premultiply blendFunction={BlendFunction.OVERLAY} opacity={0.42} />
+          <Noise premultiply blendFunction={BlendFunction.OVERLAY} opacity={0.22} />
 
         </EffectComposer>
         <Suspense fallback={null}>

@@ -144,29 +144,27 @@ export default function CameraAnimation({
           1.2
         )
         
-        // Move logo to right a little
-        tl.to(
-          logoGroup.position,
-          {
-            x: 2.0,
-            duration: 0.85,
-            delay: 1.5,
-            ease: "power3.inOut",
-          },
-          1.2
-        )
+// Move logo to right a little
+tl.to(
+  logoGroup.position,
+  {
+    x: 2.0,
+    duration: 0.85 / 1.4,
+    ease: "power3.out",
+  },
+  2.4
+)
 
-        // Move logo up a little
-        tl.to(
-          logoGroup.position,
-          {
-            y: 31,
-            duration: 1.5,
-            delay: 1.8,
-            ease: "power3.out",
-          },
-          1.2
-        )
+// Move logo up a little (starts at the same time)
+tl.to(
+  logoGroup.position,
+  {
+    y: 31,
+    duration: 1.5 / 1.4,
+    ease: "power3.out",
+  },
+  2.4
+)
 
         // Move rock group down a little (if provided)
         if (rockGroup) {
@@ -174,8 +172,8 @@ export default function CameraAnimation({
             rockGroup.position,
             {
               y: -3,
-              duration: 0.99,
-              delay: 1.4,
+              duration: 0.99/1.4,
+              delay: 1,
               ease: "power3.inOut",
             },
             1.2
@@ -207,13 +205,13 @@ export default function CameraAnimation({
             keyframes: [
               // Move forward while drifting camera to the RIGHT.
               // This makes the rock+logo appear more to the LEFT in frame (space for right-side content).
-              { x: 0.0, z: 132, y: 4.8, duration: 0.45, ease: "none" },
-              { x: 2.5, z: 110, y: 4.4, duration: 0.55, ease: "none" },
-              { x: 6.0, z: 92, y: 4.0, duration: 0.55, ease: "none" },
-              { x: 9.0, z: 78, y: 3.6, duration: 0.50, ease: "none" },
+              { x: 0.0, z: 132, y: 4.8, duration: 0.45/1.4, ease: "none" },
+              { x: 2.5, z: 110, y: 4.4, duration: 0.55/1.4, ease: "none" },
+              { x: 6.0, z: 92, y: 4.0, duration: 0.55/1.4, ease: "none" },
+              { x: 9.0, z: 78, y: 3.6, duration: 0.50/1.4, ease: "none" },
               // final: closer + slightly lower but still above water
-              { x: 12.0, z: 66, y: 1.75, duration: 0.65, ease: "power2.inOut" },
-              { x: 18.0, z: 62, y: 1.55, duration: 0.68, ease: "power2.inOut" },
+              // { x: 12.0, z: 66, y: 1.75, duration: 0.65, ease: "power2.inOut" },
+              // { x: 18.0, z: 62, y: 1.55, duration: 0.68, ease: "power2.inOut" },
             ],
             onUpdate: () => {
               if (basePos.y < MIN_WATER_Y) basePos.y = MIN_WATER_Y

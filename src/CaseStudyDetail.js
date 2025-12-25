@@ -47,7 +47,7 @@ export default function CaseStudyDetail({
     tlRef.current = tl
 
     // 1) Right media comes first (top -> bottom)
-    tl.to(right, { opacity: 1, y: 0, rotateZ: 0, duration: 1.3, ease: "power2.out" ,  stagger: 0.18 }, 0)
+    tl.to(right, { opacity: 1, y: 0, rotateZ: 0, duration: 1.3, ease: "power2.out" ,  stagger: 0.28 }, 0)
 
     // 2) Then left text reveals one by one + button
     // Wait until the right-side sequence finishes for a clear "right first, then left" beat.
