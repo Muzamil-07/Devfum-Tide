@@ -5,6 +5,7 @@ import gsap from "gsap";
 
 import logoAnimation from "./LOADER SCREEN LOGO BLINK.json";
 import noiseAnimation from "./Noise.json";
+import { triggerEnable, setMuted, setLoaderVisible } from "./utils/soundManager";
 
 export default function LoaderScreen() {
   const { active, progress } = useProgress();
@@ -188,9 +189,20 @@ export default function LoaderScreen() {
     // Ensure progress never flashes back in during exit.
     if (progressWrapRef.current) gsap.set(progressWrapRef.current, { autoAlpha: 0, display: "none" });
     if (enterBtnRef.current) gsap.set(enterBtnRef.current, { pointerEvents: "none" });
+    // user explicitly entered with sound -> unmute and try to enable audio
+    try {
+      setMuted(false)
+      void triggerEnable()
+    } catch (e) {}
     setPhase("exiting");
     setVisible(false);
   };
+
+  // Announce loader mounted state so other components can hide/show controls.
+  useEffect(() => {
+    setLoaderVisible(mounted)
+    return () => setLoaderVisible(false)
+  }, [mounted])
 
   if (!mounted) return null;
 
