@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { registerTryPlay, registerMuteHandler, getMuted, getLoaderVisible } from "./utils/soundManager";
 
 export default function BackgroundAudio({
   src = `${process.env.PUBLIC_URL}/sea sound.ogg`,
@@ -12,7 +13,13 @@ export default function BackgroundAudio({
   const tryPlay = useCallback(async () => {
     const audioEl = audioRef.current;
     if (!audioEl) return false;
-
+    // respect muted state
+    if (getMuted()) {
+      // If the app is muted, do not show the "Enable sound" prompt —
+      // the user intentionally muted audio.
+      setNeedsGesture(false);
+      return false;
+    }
     try {
       audioEl.volume = volume;
       audioEl.loop = true;
@@ -34,6 +41,8 @@ export default function BackgroundAudio({
 
     // If autoplay is blocked, start on first user gesture.
     const onGesture = () => {
+      // Ignore gestures when app is muted (avoid flipping needsGesture on incidental keys)
+      if (getMuted()) return;
       void tryPlay();
     };
 
@@ -48,6 +57,26 @@ export default function BackgroundAudio({
     };
   }, [tryPlay]);
 
+  // Register our tryPlay so the loader's "Enter with sound" can trigger it.
+  useEffect(() => {
+    registerTryPlay(tryPlay);
+    return () => registerTryPlay(null);
+  }, [tryPlay]);
+
+  // Handle external mute toggles
+  useEffect(() => {
+    registerMuteHandler((m) => {
+      const audioEl = audioRef.current;
+      if (!audioEl) return;
+      audioEl.muted = !!m;
+      if (m) {
+        setNeedsGesture(false);
+      } else {
+        void tryPlay();
+      }
+    });
+  }, [tryPlay]);
+
   // Update volume live without restarting playback.
   useEffect(() => {
     const audioEl = audioRef.current;
@@ -58,7 +87,7 @@ export default function BackgroundAudio({
   return (
     <>
       <audio ref={audioRef} src={resolvedSrc} loop preload="auto" />
-      {needsGesture ? (
+      {needsGesture && !getLoaderVisible() ? (
         <button
           type="button"
           className="glassButton bgAudioEnable"

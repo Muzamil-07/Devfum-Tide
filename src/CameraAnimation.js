@@ -2,12 +2,18 @@ import { useEffect, useRef } from "react"
 import gsap from "gsap"
 import { degToRad } from "three/src/math/MathUtils.js"
 
+// Helper to detect mobile devices
+const isMobileDevice = () => {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768
+}
+
 /**
  * Plays a one-time cinematic sequence on the first scroll / swipe:
  * 1) Fade out the big bubble
  * 2) Start logo rotation
  * 3) Move camera along a slightly "stepped" path (forward, dip, then bottom-looking angle)
  * 4) Shift camera to the right so the hero sits left, then reveal DOM content on the right
+ *    (Note: On mobile, camera goes straight to keep logo centered)
  */
 export default function CameraAnimation({
   bubbleMaterialRef,
@@ -144,16 +150,19 @@ export default function CameraAnimation({
           1.2
         )
         
-// Move logo to right a little
-tl.to(
-  logoGroup.position,
-  {
-    x: 2.0,
-    duration: 0.85 / 1.4,
-    ease: "power3.out",
-  },
-  2.4
-)
+        const isMobile = isMobileDevice()
+
+        // Move logo: desktop nudges it right to make room for content,
+        // mobile nudges it slightly left so it appears a bit left-of-center.
+        tl.to(
+          logoGroup.position,
+          {
+            x: isMobile ? -1.2 : 2.0,
+            duration: 0.85 / 1.4,
+            ease: "power3.out",
+          },
+          2.4
+        )
 
 // Move logo up a little (starts at the same time)
 tl.to(
@@ -198,12 +207,19 @@ tl.to(
       if (basePos) {
         const startAt = 1.15
         const MIN_WATER_Y = 0.9
+        const isMobile = isMobileDevice()
 
         tl.to(
           basePos,
           {
-            keyframes: [
-              // Move forward while drifting camera to the RIGHT.
+            keyframes: isMobile ? [
+              // Mobile: keep camera centered (x stays at 0) so logo appears in center
+              { x: 0.0, z: 132, y: 4.8, duration: 0.45/1.4, ease: "none" },
+              { x: 0.0, z: 110, y: 4.4, duration: 0.55/1.4, ease: "none" },
+              { x: 0.0, z: 92, y: 4.0, duration: 0.55/1.4, ease: "none" },
+              { x: 0.0, z: 78, y: 3.6, duration: 0.50/1.4, ease: "none" },
+            ] : [
+              // Desktop: drift camera to the RIGHT for asymmetric composition
               // This makes the rock+logo appear more to the LEFT in frame (space for right-side content).
               { x: 0.0, z: 132, y: 4.8, duration: 0.45/1.4, ease: "none" },
               { x: 2.5, z: 110, y: 4.4, duration: 0.55/1.4, ease: "none" },
@@ -223,12 +239,17 @@ tl.to(
 
       // Camera aim: prefer lookAt target so it smoothly ends "looking up"
       if (baseLookAt) {
+        const isMobile = isMobileDevice()
         tl.to(
           baseLookAt,
           {
-            keyframes: [
-              // keep it around the rock+logo area, slight refinement as we approach
-              // aim slightly to the RIGHT of the hero so the hero sits left-of-center in frame
+            keyframes: isMobile ? [
+              // Mobile: nudge lookAt slightly left so logo appears left-of-center
+              { x: -1.2, y: 15.8, z: 48, duration: 0.8, ease: "none" },
+              { x: -0.6, y: 16.3, z: 50, duration: 0.9, ease: "none" },
+              { x: 0.0, y: 16.8, z: 52, duration: 0.75, ease: "power2.inOut" },
+            ] : [
+              // Desktop: aim slightly to the RIGHT of the hero so hero sits left-of-center in frame
               // Lower lookAt Y => camera pitches up more => logo sits higher in frame
               { x: 3.5, y: 15.8, z: 48, duration: 0.8, ease: "none" },
               { x: 7.5, y: 16.3, z: 50, duration: 0.9, ease: "none" },
