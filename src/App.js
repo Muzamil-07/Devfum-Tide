@@ -22,6 +22,8 @@ import PostFX from './PostFx'
 import { BlendFunction } from 'postprocessing'
 import BackgroundAudio from "./BackgroundAudio"
 import SoundControls from "./SoundControls"
+import SoundToggle from "./SoundToggle"
+import { getMuted, setMuted, registerLoaderHandler } from "./utils/soundManager"
 import { setBubbleSfxVolume } from "./utils/sfx"
 
 
@@ -124,6 +126,20 @@ export default function App() {
     localStorage.setItem("bubbleVolume", String(bubbleVolume))
     setBubbleSfxVolume(bubbleVolume)
   }, [bubbleVolume])
+
+  const [muted, setMutedState] = useState(() => getMuted())
+  const [loaderVisible, setLoaderVisibleState] = useState(false)
+
+  const toggleMuted = useCallback(() => {
+    const next = !muted
+    setMuted(next)
+    setMutedState(next)
+  }, [muted])
+
+  // Update local loaderVisible state when soundManager reports changes
+  useEffect(() => {
+    registerLoaderHandler((v) => setLoaderVisibleState(!!v))
+  }, [])
 
   // Bloom values are animatable; when not exploring, keep them in sync with Leva controls.
   const bloomLevelsAnimRef = useRef({ value: levels })
@@ -421,6 +437,7 @@ export default function App() {
       </Canvas>
       {/* <Loader /> */}
       <LoaderScreen />
+      {!loaderVisible ? <SoundToggle muted={muted} onToggle={toggleMuted} /> : null}
       <div className={`sideContent ${contentVisible && !exploreMode ? "show" : ""}`}>
         <div className="sideContentInner">
           <div className="sideContentEyebrow">Devfum</div>

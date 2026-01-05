@@ -53,22 +53,42 @@
   
   /* Loader logo should visually match the 3D logo scale across screen sizes */
   :root {
-    --loader-logo-size: clamp(220px, 34vmin, 620px);
+    --loader-logo-size: clamp(220px, 70vmin, 560px);
+    --loader-actions-top: calc(var(--loader-logo-size) * 0.78);
+    --loader-actions-width: clamp(140px, 26vmin, 240px);
   }
 
   .loaderLogo {
-    width: 30vw;
-    height: 30vw;
+    margin-top: 0; /* desktop: no margin-top */
+    margin-bottom: 10px;
+    width: var(--loader-logo-size);
+    height: var(--loader-logo-size);
     display: block;
+  }
+
+  /* Tablet: up to 900px wide (but above mobile) */
+  @media (max-width: 900px) and (min-width: 601px) {
+    .loaderLogo { 
+      margin-top: 20px;
+      margin-bottom: 0;
+    }
+  }
+
+  /* Mobile: 600px and below */
+  @media (max-width: 600px) {
+    .loaderLogo { 
+      margin-top: 30px; 
+      margin-bottom: 0;
+    }
   }
 
   /* Loader progress + enter button are anchored below the logo WITHOUT shifting it */
   .loaderActions {
     position: absolute;
     left: 50%;
-    top: calc(23vw);
+    top: var(--loader-actions-top);
     transform: translateX(-50%);
-    width: clamp(120px, 18vmin, 220px);
+    width: var(--loader-actions-width);
     display: flex;
     flex-direction: column;
     align-items: center;

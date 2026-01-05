@@ -1,10 +1,11 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import Lottie from "lottie-react";
 import { useProgress } from "@react-three/drei";
 import gsap from "gsap";
 
 import logoAnimation from "./LOADER SCREEN LOGO BLINK.json";
 import noiseAnimation from "./Noise.json";
+import { triggerEnable, setMuted, setLoaderVisible } from "./utils/soundManager";
 
 export default function LoaderScreen() {
   const { active, progress } = useProgress();
@@ -24,6 +25,35 @@ export default function LoaderScreen() {
   const enterBtnRef = useRef(null);
   const readyTlRef = useRef(null);
   const scrollLockStateRef = useRef(null);
+
+  // Keep loader logo + actions sized to the visible screen so the match-cut to the 3D logo lines up on all devices.
+  const updateLoaderSizingVars = useCallback(() => {
+    const docEl = document.documentElement;
+    const w = window.innerWidth || 0;
+    const h = window.innerHeight || 0;
+    const shortSide = Math.max(1, Math.min(w, h));
+
+    // On narrow/mobile widths we want the loader logo to be proportionally larger
+    // so the match-cut aligns better with the 3D logo. Increase the top offset
+    // as well so the actions sit further below the logo on mobile.
+    const isMobile = w <= 500;
+    let logoSize, actionsTop, actionsWidth;
+
+    if (isMobile) {
+      // Use viewport width (not shortest side) on narrow screens and bias upward
+      logoSize = Math.min(520, Math.max(260, w * 0.82));
+      actionsTop = Math.round(logoSize * 0.85);
+      actionsWidth = Math.min(220, Math.max(140, w * 0.5));
+    } else {
+      logoSize = Math.min(560, Math.max(210, shortSide * 0.56));
+      actionsTop = Math.round(logoSize * 0.78);
+      actionsWidth = Math.min(240, Math.max(140, shortSide * 0.34));
+    }
+
+    docEl.style.setProperty("--loader-logo-size", `${logoSize}px`);
+    docEl.style.setProperty("--loader-actions-top", `${actionsTop}px`);
+    docEl.style.setProperty("--loader-actions-width", `${actionsWidth}px`);
+  }, []);
 
   useEffect(() => {
     if (phase !== "loading") return;
@@ -133,7 +163,8 @@ export default function LoaderScreen() {
     gsap.set(progressWrap, { clearProps: "all" });
     gsap.set(progressWrap, { autoAlpha: 1, display: "block" });
     gsap.set(enterBtn, { autoAlpha: 0, pointerEvents: "none" });
-  }, [mounted]);
+    updateLoaderSizingVars();
+  }, [mounted, updateLoaderSizingVars]);
 
   // When we reach 100% (ready), animate progress bar out and fade button in (GSAP).
   useLayoutEffect(() => {
@@ -183,14 +214,31 @@ export default function LoaderScreen() {
     return () => clearTimeout(t);
   }, [phase]);
 
+  useLayoutEffect(() => {
+    updateLoaderSizingVars();
+    window.addEventListener("resize", updateLoaderSizingVars);
+    return () => window.removeEventListener("resize", updateLoaderSizingVars);
+  }, [updateLoaderSizingVars]);
+
   const onEnter = () => {
     if (phase !== "ready") return;
     // Ensure progress never flashes back in during exit.
     if (progressWrapRef.current) gsap.set(progressWrapRef.current, { autoAlpha: 0, display: "none" });
     if (enterBtnRef.current) gsap.set(enterBtnRef.current, { pointerEvents: "none" });
+    // user explicitly entered with sound -> unmute and try to enable audio
+    try {
+      setMuted(false)
+      void triggerEnable()
+    } catch (e) {}
     setPhase("exiting");
     setVisible(false);
   };
+
+  // Announce loader mounted state so other components can hide/show controls.
+  useEffect(() => {
+    setLoaderVisible(mounted)
+    return () => setLoaderVisible(false)
+  }, [mounted])
 
   if (!mounted) return null;
 
