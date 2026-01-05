@@ -165,6 +165,13 @@ export function OneShotBubbles({
 }) {
   const [bubbles, setBubbles] = useState([])
 
+  // IMPORTANT: many props are arrays (ranges/coords). If callers pass inline literals,
+  // their identity changes every render, which would recreate callbacks and restart
+  // the cycle. Convert to primitive deps to keep the cycle stable across re-renders.
+  const [spawnCenterX, spawnCenterZ] = spawnCenter
+  const pairSepMin = pairSeparationRange[0]
+  const pairSepMax = pairSeparationRange[1]
+
   const cycleRunning = useRef(false)
   const spawnedThisCycle = useRef(0)
 
@@ -182,12 +189,11 @@ export function OneShotBubbles({
   }, [bubbles.length])
 
   const makeSpawnPoint = useCallback(() => {
-    const [cx, cz] = spawnCenter
     const along = rand(-spacing, spacing)
     const perp = rand(-spacing * perpendicularSpread, spacing * perpendicularSpread)
 
-    let x = cx
-    let z = cz
+    let x = spawnCenterX
+    let z = spawnCenterZ
     if (direction === "x") {
       x += along
       z += perp
@@ -199,7 +205,7 @@ export function OneShotBubbles({
     x += rand(-jitter, jitter)
     z += rand(-jitter, jitter)
     return { x, z }
-  }, [spawnCenter, spacing, perpendicularSpread, direction, jitter])
+  }, [spawnCenterX, spawnCenterZ, spacing, perpendicularSpread, direction, jitter])
 
   const spawnOne = useCallback(() => {
     const p = makeSpawnPoint()
@@ -212,7 +218,7 @@ export function OneShotBubbles({
 
   const spawnPairNear = useCallback(() => {
     const a = spawnOne()
-    const d = rand(pairSeparationRange[0], pairSeparationRange[1])
+    const d = rand(pairSepMin, pairSepMax)
     const ang = Math.random() * Math.PI * 2
     const b = {
       id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
@@ -220,7 +226,7 @@ export function OneShotBubbles({
       z: a.z + Math.sin(ang) * d,
     }
     return [a, b]
-  }, [spawnOne, pairSeparationRange])
+  }, [spawnOne, pairSepMin, pairSepMax])
 
   const onProgress = useCallback((id, p) => {
     progressMap.current.set(id, p)
